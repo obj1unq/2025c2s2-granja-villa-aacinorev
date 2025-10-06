@@ -1,6 +1,7 @@
 import wollok.game.*
 import personaje.*
 import cultivos.*
+import bonus.*
 
 program farmville {
 	//  CONFIG	
@@ -11,13 +12,20 @@ program farmville {
 
 	//  VISUALES
  	game.addVisualCharacter(personaje)
- 	game.addVisual(new Maiz()) // Se agrega a modo de prueba
+ 	game.addVisual(new Maiz(position = game.at(2,1))) // Se agrega a modo de prueba
  	
 	// ACCIONES
 	keyboard.m().onPressDo({personaje.sembrarMaiz()})
 	keyboard.t().onPressDo({personaje.sembrarTrigo()})
 	keyboard.o().onPressDo({personaje.sembrarTomaco()})
 	keyboard.r().onPressDo({personaje.regar()})
+	keyboard.c().onPressDo({personaje.cosechar()})
+	keyboard.v().onPressDo({personaje.vender()})
+	keyboard.space().onPressDo({game.say(personaje, personaje.estadoActual())})
+	keyboard.a().onPressDo({personaje.ponerAspersor()})
+
+	// EVENTOS
+	game.onTick(1000, "rieganAspersores", {personaje.aspersoresPuestos().forEach({aspersor => aspersor.regarTodos()})})
 
  	//  COMIENZA
 	game.start()
