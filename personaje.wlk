@@ -4,10 +4,13 @@ import cultivos.*
 object personaje {
 	var property position = game.center()
 	const property image = "fplayer.png"
-	const cultivosAqui = {(game.getObjectsIn(self.position()))
-							cultivosAqui.remove(self)}
+	method cultivosAqui () {
+		const cultivos = game.getObjectsIn(self.position())
+		cultivos.remove(self)
+		return cultivos
+	}
 	method cultivoAqui(){
-		return cultivosAqui.first()
+		return self.cultivosAqui().first()
 	}
 	method sembrarMaiz(){
 		self.validarSembrado()
@@ -28,11 +31,11 @@ object personaje {
 	}
 
 	method regar(){
-		(self.cultivoAqui().first()).seRiega()
+		self.cultivoAqui().seRiega()
 	}
 
 	method validarSembrado(){
-		if (not cultivosAqui.isEmpty()){
+		if (not self.cultivosAqui().isEmpty()){
 			self.error("Ya hay un cultivo ahi!")
 		}
 	}

@@ -15,8 +15,9 @@ class Maiz {
 
 class Trigo {
 	var property position = game.at(2,1)
-	method image(){
-		return "wheat_0.png"
+	method image() = "wheat_" + etapaEvolucion + ".png"
+	method etapaEvolucion(){
+
 	}
 }
 
