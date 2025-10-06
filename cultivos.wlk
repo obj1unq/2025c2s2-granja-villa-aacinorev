@@ -2,10 +2,14 @@ import wollok.game.*
 
 class Maiz {
 	var property position = game.at(1,1)
+	var property image = "corn_baby.png"
+	var fueRegada = false
 
-	method image() {
-		// TODO: hacer que devuelva la imagen que corresponde
-		return "corn_baby.png"
+	method seRiega(){
+		if (not fueRegada){
+			image = "corn_adult.png"  // Si no fue regada antes, se riega
+			fueRegada = true
+		}
 	}
 }
 
