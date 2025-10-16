@@ -11,9 +11,11 @@ program farmville {
 	game.ground("ground.png")
 
 	//  VISUALES
+	game.addVisual(new Mercado(position = game.at(0,5)))
+	game.addVisual(new Mercado(position = game.at(0,6), monedas = 10000))
  	game.addVisualCharacter(personaje)
  	game.addVisual(new Maiz(position = game.at(2,1))) // Se agrega a modo de prueba
- 	
+
 	// ACCIONES
 	keyboard.m().onPressDo({personaje.sembrarMaiz()})
 	keyboard.t().onPressDo({personaje.sembrarTrigo()})

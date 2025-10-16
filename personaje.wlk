@@ -9,14 +9,14 @@ object personaje {
 	var property oro = 0
 	var property aspersoresPuestos = []
 
-	method cultivosAqui () {
+	method cosasAqui () {
 		const cultivos = game.getObjectsIn(self.position())
 		cultivos.remove(self)
 		return cultivos
 	}
 
-	method cultivoAqui(){
-		return self.cultivosAqui().first()
+	method cosaAqui(){
+		return self.cosasAqui().first()
 	}
 
 	method sembrarMaiz(){
@@ -38,20 +38,27 @@ object personaje {
 	}
 
 	method validarPoner(){
-		if (not self.cultivosAqui().isEmpty()){
+		if (not self.cosasAqui().isEmpty()){
 			self.error("Ya hay algo acá!")
 		}
 	}
 
 	method regar(){
-		self.cultivoAqui().seRiega()
+		self.validarRegar()
+		self.cosaAqui().seRiega()
+	}
+
+	method validarRegar(){
+		if (self.cosasAqui().isEmpty()){
+			self.error("No puedo regar la nada!")
+		}
 	}
 
 	method cosechar(){
 		self.validarCosechado()
-		if(self.cultivoAqui().esCosechable()){				//Si es cosechable...
-			cosechasParaVenta.add(self.cultivoAqui())	    //Recordar lo que voy a cosechar
-			game.removeVisual(self.cultivoAqui())   		//Cosecharlo
+		if(self.cosaAqui().esCosechable()){				//Si es cosechable...
+			cosechasParaVenta.add(self.cosaAqui())	    //Recordar lo que voy a cosechar
+			game.removeVisual(self.cosaAqui())   		//Cosecharlo
 		}
 		else{
 			self.error("No está listo para cosechar!")
@@ -59,14 +66,28 @@ object personaje {
 	}
 	
 	method validarCosechado(){
-		if (self.cultivosAqui().isEmpty()){
+		if (self.cosasAqui().isEmpty()){
 			self.error("No hay un cultivo para cosechar!")
 		}
 	}
+	
+	method valorDeCosechas(){
+		var valor = 0
+		cosechasParaVenta.forEach({planta => valor += planta.valor()})
+		return valor
+	}
 
 	method vender(){
-		cosechasParaVenta.forEach({planta => oro += planta.valor()})
+		self.validarVenta()
+		self.cosaAqui().comprar(cosechasParaVenta, self.valorDeCosechas())
+		oro += self.valorDeCosechas()
 		cosechasParaVenta.clear()
+	}
+
+	method validarVenta(){
+		if(self.cosasAqui().isEmpty() || self.cosaAqui().kindName() != "a Mercado"){  // Si donde estoy parada no hay nada, tira el error. Y si donde estoy parada hay algo pero no es un mercado, también tira error.
+			self.error("No puedo vender, no estoy en el mercado")
+		}
 	}
 
 	method estadoActual(){
@@ -74,6 +95,7 @@ object personaje {
 	}
 
 	method ponerAspersor(){
+		self.validarPoner()
 		const nuevoAspersor = new Aspersor (position = self.position())
 		game.addVisual(nuevoAspersor)
 		aspersoresPuestos.add(nuevoAspersor)
