@@ -98,4 +98,7 @@ class Mercado {
         }
     }
 
+    method seRiega(){
+        // No hace nada, no es regable
+    }
 }

@@ -51,11 +51,19 @@ class Tomaco {
 	}
 
 	method seRiega(){
+		self.validarRegar()  // Si hay algo arriba suyo, no puede subir
 		if(position != game.at(position.x(), game.height()-1)){  // Si no está en el borde, que suba
 			position = position.up(1)
 		}
 		else{
-			position = game.at(position.x(), 0)
+			position = game.at(position.x(), 0)		// Si llega al borde, pasa abajo de todo
+		}
+	}
+
+	method validarRegar(){
+		const cosasArriba = game.getObjectsIn(position.up(1))
+		if(not cosasArriba.isEmpty()){    // Si hay algo arriba suyo, no sube
+			self.error("")
 		}
 	}
 
