@@ -57,8 +57,11 @@ describe "Regar los cultivos"{
         personaje.regar()
         assert.that(personaje.cosasAqui().isEmpty())  // No hay nada en la posicion del personaje porque se movio el tomaco
     }
-    //test "No puede regar el tomaco porque hay algo arriba"{
-    //}
+    test "No puede regar el tomaco porque hay algo arriba"{
+        game.addVisual(new Maiz(position = personaje.position().up(1)))
+        personaje.sembrarTomaco()
+        assert.throwsException({ personaje.regar() })
+    }
 }
 
 describe "Cosechar los cultivos"{
@@ -81,14 +84,88 @@ describe "Cosechar los cultivos"{
         personaje.regar()
         personaje.regar()
         personaje.cosechar()
-        assert.that(personaje.cosasAqui().isEmpty())
-        assert.equals("a Trigo", personaje.cosechasParaVenta().first().kindName())
+        assert.that(personaje.cosasAqui().isEmpty()) // Deberia cosecharse (no esta mas en el suelo) cuando esta en etapa 2
+        assert.equals("a Trigo", personaje.cosechasParaVenta().first().kindName()) // Deberia haber un trigo en la lista de cosechas para venta
         personaje.sembrarTrigo()
         personaje.regar()
         personaje.regar()
         personaje.regar()
         personaje.cosechar()
+        assert.that(personaje.cosasAqui().isEmpty())    // Deberia cosecharse (no esta mas en el suelo) cuando esta en etapa 3
+        assert.equals(2, personaje.cosechasParaVenta().size()) // Deberian haber dos elementos en la lista de cosechas (los dos trigos)
+    }
+    test "No puede cosechar el trigo porque no está en una etapa cosechable"{
+        personaje.sembrarTrigo()                        
+        assert.throwsException({personaje.cosechar()})  // Etapa 0, no deberia poder cosecharse
+        personaje.regar()
+        assert.throwsException({personaje.cosechar()}) // Etapa 1, no deberia poder cosecharse
+    }
+    test "Cosecha el tomaco exitosamente"{
+        personaje.sembrarTomaco()
+        personaje.cosechar()
         assert.that(personaje.cosasAqui().isEmpty())
-        assert.equals(2, personaje.cosechasParaVenta().size())
+        assert.equals("a Tomaco", personaje.cosechasParaVenta().first().kindName())
+    }
+}
+
+describe "Vender los cultivos"{
+    method initialize(){
+        personaje.sembrarTomaco()
+        personaje.cosechar()  // cuando venda, consigue 80 monedas
+    }
+    test "No puede vender porque no está en un mercado"{
+        assert.throwsException({personaje.vender()})
+    }
+    test "No puede vender porque el mercado no tiene suficientes monedas"{
+        game.addVisual(new Mercado(position = personaje.position()))  // Arranca con 0 monedas
+        assert.throwsException({personaje.vender()})                  // Quiere vender el tomaco que vale 80, no puede
+    }
+    test "Vende exitosamente"{
+        const unMercado = new Mercado(position = personaje.position(), monedas = 100)
+        game.addVisual(unMercado)
+        personaje.vender()
+        assert.that(personaje.cosechasParaVenta().isEmpty())                   // Se vacian las cosechas porque se venden
+        assert.equals(80, personaje.oro())                                     // El personaje consigue 80 oro
+        assert.equals("a Tomaco", unMercado.mercaderia().first().kindName())   // El tomaco deberia estar en la mercaderia
+        assert.equals(20, unMercado.monedas())                                 // La mercaderia deberia tener menos 80 monedas
+    }
+}
+
+describe "Poner aspersores y riegan"{
+    method initialize(){
+        personaje.position(game.at(5,5)) 
+    }
+    test "Pone un aspersor exitosamente"{
+        personaje.ponerAspersor()
+        assert.that(not personaje.cosasAqui().isEmpty())
+    }
+    test "El aspersor riega exitosamente"{
+        const maizNorte = new Maiz(position = game.at(5,6))
+        const maizNoreste = new Maiz(position = game.at(6,6))
+        const maizEste = new Maiz(position = game.at(6,5))
+        const maizSureste = new Maiz(position = game.at(6,4))
+        const maizSur = new Maiz(position = game.at(5,4))
+        const maizSuroeste = new Maiz(position = game.at(4,4))
+        const maizOeste = new Maiz(position = game.at(4,5))
+        const maizNoroeste = new Maiz(position = game.at(4,6))
+        game.addVisual(maizNorte)
+        game.addVisual(maizNoreste)
+        game.addVisual(maizEste)
+        game.addVisual(maizSureste)
+        game.addVisual(maizSur)
+        game.addVisual(maizSuroeste)
+        game.addVisual(maizOeste)
+        game.addVisual(maizNoroeste)
+        personaje.ponerAspersor()                                   
+        assert.equals("an Aspersor", personaje.cosaAqui().kindName()) //Deberia haber un aspersor en la posicion del personaje
+        personaje.cosaAqui().regarTodos()
+        assert.equals("corn_adult.png", maizNorte.image())
+        assert.equals("corn_adult.png", maizNoreste.image())
+        assert.equals("corn_adult.png", maizEste.image())
+        assert.equals("corn_adult.png", maizSureste.image())
+        assert.equals("corn_adult.png", maizSur.image())
+        assert.equals("corn_adult.png", maizSuroeste.image())
+        assert.equals("corn_adult.png", maizOeste.image())
+        assert.equals("corn_adult.png", maizNoroeste.image()) // Se deberian regar los maices que estan en todas las direcciones
     }
 }

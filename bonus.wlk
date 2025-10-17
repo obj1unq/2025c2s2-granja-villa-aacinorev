@@ -27,6 +27,10 @@ class Aspersor {
     method seRiega(){
         // No hace nada, no es regable
     }
+
+    method esCosechable(){
+        return false 
+    }
 }
 
 // Direcciones
@@ -84,7 +88,7 @@ class Mercado {
     var property position
     const property image = "market.png"
     var property monedas = 0
-    const mercaderia = []
+    const property mercaderia = []
 
     method comprar(bienes, precio){
         self.validarCompra(precio)
@@ -100,5 +104,9 @@ class Mercado {
 
     method seRiega(){
         // No hace nada, no es regable
+    }
+
+    method esCosechable(){
+        return false 
     }
 }

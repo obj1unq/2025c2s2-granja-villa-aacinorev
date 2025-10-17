@@ -71,10 +71,8 @@ object personaje {
 		}
 	}
 	
-	method valorDeCosechas(){
-		var valor = 0
-		cosechasParaVenta.forEach({planta => valor += planta.valor()})
-		return valor
+	method valorDeCosechas(){		
+		return cosechasParaVenta.sum({planta => planta.valor()})
 	}
 
 	method vender(){
